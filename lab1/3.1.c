@@ -1,5 +1,42 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
+
+int isNumber(const char *s){
+    printf("%s\n", s);
+    for (int i = 0; s[i] != '\0'; i++) {
+        if (isdigit(s[i])) {
+            printf("'%c' jest cyfra\n", s[i]);
+        }
+        else{
+            printf("'%c' nie jest cyfra\n", s[i]);
+        }
+    }
+}
+
+
+char *trim(char *s){
+    while(isspace(*s)){
+        s++;
+    }
+    char *end = s + strlen(s) - 1;
+    while(end > s && isspace(*end)){
+        end--;
+    }
+    *(end + 1) = '\0';
+ 
+    return s;
+}
+
+
+int getOperator(char *operator, const char *s){
+    if(s == '/' || s == '*' || s == '+'|| s =='-'){
+        return 1;
+    }else{
+        return 0;
+    }
+}
 
 struct Fraction {
     int num, den;
