@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_LINE_LENGTH 256
+
+void delete_user(const char *first_name, const char *last_name) {
+    char username[128];
+    char command[512];
+
+    snprintf(username, sizeof(username), "%s%s", first_name, last_name);
+
+    snprintf(command, sizeof(command), "sudo userdel -r %s", username);
+
+    int result = system(command);
+
+    if (result == 0) {
+        printf("Użytkownik %s został pomyślnie usunięty.\n", username);
+    } else {
+        fprintf(stderr, "Błąd: Nie udało się usunąć użytkownika %s.\n", username);
+    }
+}
+
+int main() {
+    FILE *file = fopen("baza.txt", "r");
+    if (file == NULL) {
+        perror("Nie można otworzyć pliku baza.txt");
+        return 1;
+    }
+
+    char line[MAX_LINE_LENGTH];
+    while (fgets(line, sizeof(line), file)) {
+
+        line[strcspn(line, "\n")] = 0;
+
+        char *first_name = strtok(line, ";");
+        char *last_name = strtok(NULL, ";");
+        char *password = strtok(NULL, ";"); // hasło jest ignorowane przy usuwaniu
+
+        if (first_name && last_name) {
+            delete_user(first_name, last_name);
+        } else {
+            fprintf(stderr, "Błąd: Niepoprawny format danych w linii: %s\n", line);
+        }
+    }
+
+    fclose(file);
+    return 0;
+}
