@@ -12,7 +12,7 @@ section  .data
 prompt   db "podaj nazwe: ", 0
 format   db "%s", 0  ; do zapisania nazwy folderu
 goodInfo  db "utworzylem folder '%s' ", 0xA, 0
-badInfo db "nie udalo sie uwtoryzc", 0xA, 0
+badInfo db "nie udalo sie utworzyc", 0xA, 0
 
 section  .bss
 folderName:  resb 256 ; nazwa zmiennej i rezerwacja 256
