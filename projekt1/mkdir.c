@@ -3,12 +3,15 @@
 #include <sys/types.h>
 
 int main() {
-    const char *folderName = "katalog_projekt";  
+	char folderName[256];
+	
+	printf("podaj nazwe: ");
+	scanf("%255s", folderName); 
 
     if (mkdir(folderName) == 0) {
-        printf("Katalog '%s' został pomyślnie utworzony.\n", folderName);
+        printf("utworzylem folder %s\n", folderName);
     } else {
-        printf("Błąd podczas tworzenia katalogu");
+        printf("nie udalo sie utworzyc\n");
     }
 
     return 0;
