@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+
+int cyfry1(int liczba) {
+    if (liczba == 0) return 1;
+    return (int)log10(abs(liczba)) + 1;
+}
+
+int cyfry2(int liczba) {
+    char buffer[50];
+    snprintf(buffer, 50, "%d", abs(liczba)); 
+    return strlen(buffer);
+}
+
+int cyfry3(int liczba) {
+    if (liczba == 0) return 1; 
+    int count = 0;
+    do {
+        liczba /= 10;
+        count++;
+    } while (liczba != 0);
+    return count;
+}
+
+int main() {
+    int liczba = -312359;
+    printf("cyfry1(%d) = %d\n", liczba, cyfry1(liczba));
+    printf("cyfry2(%d) = %d\n", liczba, cyfry2(liczba));
+    printf("cyfry3(%d) = %d\n", liczba, cyfry3(liczba));
+    return 0;
+}

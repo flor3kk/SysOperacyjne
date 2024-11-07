@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <string.h>
+
+void dodawanie_pisemne(int a, int b) {
+
+    char a_str[20], b_str[20];
+    snprintf(a_str, sizeof(a_str), "%d", a);
+    snprintf(b_str, sizeof(b_str), "%d", b);
+
+    int len_a = strlen(a_str), len_b = strlen(b_str);
+    int max_len = len_a > len_b ? len_a : len_b;
+
+    char a_pad[20] = {0}, b_pad[20] = {0};
+    memset(a_pad, '0', max_len - len_a);
+    strcat(a_pad, a_str);
+    memset(b_pad, '0', max_len - len_b);
+    strcat(b_pad, b_str);
+
+    int wynik[21] = {0}; 
+    int przeniesienia[21] = {0};  
+    int przeniesienie = 0;
+
+    for (int i = max_len - 1; i >= 0; i--) {
+        int suma_kolumny = (a_pad[i] - '0') + (b_pad[i] - '0') + przeniesienie;
+        if (suma_kolumny >= 10) {
+            przeniesienie = suma_kolumny / 10;
+            przeniesienia[i] = przeniesienie;
+            wynik[i + 1] = suma_kolumny % 10;
+        } else {
+            przeniesienie = 0;
+            przeniesienia[i] = 0;
+            wynik[i + 1] = suma_kolumny;
+        }
+    }
+    wynik[0] = przeniesienie; 
+
+    printf(" ");
+    for (int i = 0; i < max_len; i++) {
+        if (przeniesienia[i] > 0) printf(" %d", przeniesienia[i]);
+        else printf("  ");
+    }
+    printf("\n");
+
+    printf(" ");
+    for (int i = 0; i < max_len; i++) {
+        printf(" %c", a_pad[i]);
+    }
+    printf("\n");
+
+    printf("+");
+    for (int i = 0; i < max_len; i++) {
+        printf(" %c", b_pad[i]);
+    }
+    printf("\n");
+
+    printf(" ");
+    for (int i = 0; i <= max_len; i++) {
+        printf("--");
+    }
+    printf("\n");
+
+    printf(" ");
+    int start = (wynik[0] == 0) ? 1 : 0; 
+    for (int i = start; i <= max_len; i++) {
+        printf(" %d", wynik[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int a, b;
+    printf("Podaj liczbę a: ");
+    scanf("%d", &a);
+    printf("Podaj liczbę b: ");
+    scanf("%d", &b);
+
+    printf("\nWynik dodawania pisemnego:\n");
+    dodawanie_pisemne(a, b);
+
+    return 0;
+}
