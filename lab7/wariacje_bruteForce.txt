@@ -1,0 +1,20 @@
+#include <stdio.h>
+
+int wariacje2() {
+    char znaki[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./";
+    int all = sizeof(znaki) - 1;
+    int count = 0;
+
+    for (int i = 0; i < all; i++) {
+        for (int j = 0; j < all; j++) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+int main() {
+    printf("wariacje: %d\n", wariacje2());
+    return 0;
+}

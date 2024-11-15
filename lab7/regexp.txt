@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <regex.h>
+#include <string.h>
+
+void match_regex(const char *pattern, const char *text) {
+    regex_t regex;
+    int reti;
+
+    reti = regcomp(&regex, pattern, REG_EXTENDED);
+    if (reti) {
+        fprintf(stderr, "nie skompilowalo sie\n");
+        return;
+    }
+
+    reti = regexec(&regex, text, 0, NULL, 0);
+    if (!reti) {
+        printf("tekst '%s' pasuje\n", text);
+    } else if (reti == REG_NOMATCH) {
+        printf("tekst '%s' nie pasuje\n", text);
+    } else {
+        char msgbuf[100];
+        regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+        fprintf(stderr, "blad: %s\n", msgbuf);
+    }
+
+    regfree(&regex);
+}
+
+int main() {
+    // do maila przyrownanie
+    const char *pattern = "^[a-zA-Z]+@[a-zA-Z]+\\.[a-zA-Z]{2,}$";
+    const char *texts[] = {
+        "test@test.test",
+        "nie ma",
+        "flore@florek.xd",
+        "niedziala@xd",
+        NULL
+    };
+
+    printf("sprawdzenie dopasowania wzorca do: %s\n", pattern);
+    for (int i = 0; texts[i] != NULL; i++) {
+        match_regex(pattern, texts[i]);
+    }
+
+    return 0;
+}
