@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+
+int get_next_char(FILE *fp) {
+    int ch;
+    do {
+        ch = fgetc(fp);
+    } while (ch == '\r'); 
+    return ch;
+}
+
+void compare_files(const char *file1, const char *file2) {
+    FILE *fp1 = fopen(file1, "r");
+    FILE *fp2 = fopen(file2, "r");
+
+    if (fp1 == NULL || fp2 == NULL) {
+        perror("Nie można otworzyć pliku");
+        exit(EXIT_FAILURE);
+    }
+
+    int ch1, ch2;
+    int char_count = 0; 
+    int line_count = 1; 
+
+    while ((ch1 = get_next_char(fp1)) != EOF && (ch2 = get_next_char(fp2)) != EOF) {
+        char_count++;
+
+        if (ch1 == '\n') {
+            line_count++;
+        }
+
+        if (ch1 != ch2) {
+            printf("Pliki różnią się od znaku nr %d w linii %d.\n", char_count, line_count);
+            fclose(fp1);
+            fclose(fp2);
+            return;
+        }
+    }
+
+    if (ch1 != EOF || ch2 != EOF) {
+        int extra_count = 0;
+        const char *extra_file;
+
+        if (ch1 != EOF) {
+            extra_file = file1;
+            do {
+                extra_count++;
+            } while (fgetc(fp1) != EOF);
+        } else {
+            extra_file = file2;
+            do {
+                extra_count++;
+            } while (fgetc(fp2) != EOF);
+        }
+
+        printf("Plik '%s' zawiera %d znaków więcej niż zawartość drugiego pliku.\n", extra_file, extra_count);
+    } else {
+        printf("Pliki są identyczne.\n");
+    }
+
+    fclose(fp1);
+    fclose(fp2);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Użycie: %s <plik1> <plik2>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    compare_files(argv[1], argv[2]);
+
+    return EXIT_SUCCESS;
+}

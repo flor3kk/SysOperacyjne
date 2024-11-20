@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_LINE_LENGTH 1024
+#define MAX_LINES 1000
+
+void copy_last_10_chars(FILE *source, FILE *destination) {
+    fseek(source, 0, SEEK_END);
+    long file_size = ftell(source);
+
+    if (file_size < 10) {
+        fseek(source, 0, SEEK_SET);
+    } else {
+        fseek(source, -10, SEEK_END);
+    }
+
+    char buffer[11] = {0};
+    fread(buffer, sizeof(char), 10, source);
+    fprintf(destination, "Ostatnie 10 znaków:\n%s\n\n", buffer);
+}
+
+
+void copy_last_10_words(FILE *source, FILE *destination) {
+    fseek(source, 0, SEEK_END);
+    long file_size = ftell(source);
+    char *content = malloc(file_size + 1);
+
+    if (!content) {
+        perror("Błąd alokacji pamięci");
+        return;
+    }
+
+    fseek(source, 0, SEEK_SET);
+    fread(content, sizeof(char), file_size, source);
+    content[file_size] = '\0';
+
+    char *words[10] = {NULL};
+    int word_count = 0;
+
+    char *token = strtok(content, " \t\n");
+    while (token != NULL) {
+        if (word_count < 10) {
+            words[word_count++] = token;
+        } else {
+            for (int i = 1; i < 10; i++) {
+                words[i - 1] = words[i];
+            }
+            words[9] = token;
+        }
+        token = strtok(NULL, " \t\n");
+    }
+
+    fprintf(destination, "Ostatnie 10 słów:\n");
+    for (int i = 0; i < word_count; i++) {
+        fprintf(destination, "%s ", words[i]);
+    }
+    fprintf(destination, "\n\n");
+
+    free(content);
+}
+
+void copy_last_10_lines(FILE *source, FILE *destination) {
+    char *lines[MAX_LINES];
+    int line_count = 0;
+
+    char buffer[MAX_LINE_LENGTH];
+    while (fgets(buffer, MAX_LINE_LENGTH, source) != NULL) {
+        if (line_count < MAX_LINES) {
+            lines[line_count] = strdup(buffer);
+            line_count++;
+        } else {
+            free(lines[0]);
+            for (int i = 1; i < MAX_LINES; i++) {
+                lines[i - 1] = lines[i];
+            }
+            lines[MAX_LINES - 1] = strdup(buffer);
+        }
+    }
+
+    fprintf(destination, "Ostatnie 10 linii:\n");
+    int start = (line_count > 10) ? line_count - 10 : 0;
+    for (int i = start; i < line_count; i++) {
+        fprintf(destination, "%s", lines[i]);
+        free(lines[i]);
+    }
+    fprintf(destination, "\n");
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Użycie: %s <plik_źródłowy> <plik_docelowy>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *source = fopen(argv[1], "r");
+    if (!source) {
+        perror("Błąd otwarcia pliku źródłowego");
+        return 1;
+    }
+
+    FILE *destination = fopen(argv[2], "w");
+    if (!destination) {
+        perror("Błąd otwarcia pliku docelowego");
+        fclose(source);
+        return 1;
+    }
+
+    copy_last_10_chars(source, destination);
+    rewind(source);
+
+    copy_last_10_words(source, destination);
+    rewind(source);
+
+    copy_last_10_lines(source, destination);
+
+    fclose(source);
+    fclose(destination);
+
+    printf("Dane zostały skopiowane do pliku '%s'.\n", argv[2]);
+    return 0;
+}

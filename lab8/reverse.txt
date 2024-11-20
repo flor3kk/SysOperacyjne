@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_LINE_LENGTH 1024
+
+void reverseLine(char *line) {
+    int len = strlen(line);
+    for (int i = 0; i < len / 2; i++) {
+        char temp = line[i];
+        line[i] = line[len - i - 1];
+        line[len - i - 1] = temp;
+    }
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Użycie: %s <nazwa_pliku>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "r");
+    if (file == NULL) {
+        perror("Błąd otwarcia pliku");
+        return 1;
+    }
+
+    char line[MAX_LINE_LENGTH];
+
+    while (fgets(line, MAX_LINE_LENGTH, file) != NULL) {
+        line[strcspn(line, "\n")] = '\0';
+
+        reverseLine(line);
+
+        printf("%s\n", line);
+    }
+
+    fclose(file);
+    return 0;
+}
